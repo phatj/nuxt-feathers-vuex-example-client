@@ -1,5 +1,32 @@
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const {
+  API_HOST,
+  API_PORT,
+  CLIENT_HOST,
+  CLIENT_PORT,
+  COOKIE_NAME,
+  USE_SSL,
+  DEBUG,
+  PRESERVE_STATE
+} = process.env;
+
 export default {
   mode: 'universal',
+  env: {
+    API_HOST,
+    API_PORT,
+    COOKIE_NAME,
+    USE_SSL: !!USE_SSL,
+    debug: !!DEBUG,
+    preserveState: PRESERVE_STATE !== 'false'
+  },
+  server: {
+    port: CLIENT_PORT,
+    host: CLIENT_HOST
+  },
   /*
    ** Headers of the page
    */
@@ -27,7 +54,15 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: [],
+  plugins: [
+    '~/plugins/logger',
+    '~/plugins/feathers-client',
+    '~/plugins/feathers-auth',
+    {
+      src: '~/plugins/client-init',
+      mode: 'client'
+    }
+  ],
   /*
    ** Nuxt.js dev-modules
    */
@@ -46,6 +81,10 @@ export default {
     /*
      ** You can extend webpack config here
      */
-    extend(config, ctx) {}
+    extend(config, ctx) {},
+    transpile: ['feathers-vuex', 'vee-validate/dist/rules'],
+    babel: {
+      sourceType: 'unambiguous'
+    }
   }
-}
+};
